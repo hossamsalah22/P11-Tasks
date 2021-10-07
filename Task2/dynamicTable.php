@@ -90,7 +90,7 @@ foreach ($users as $index => $user) {
             $rowData .= $data;
         } else {
             foreach ($data as $k => $v) {
-                if ($k === 'gender') {
+                if ($info == 'gender') {
                     if ($v == 'm') {
                         $rowData .= "Male";
                     } elseif ($v == 'f') {
