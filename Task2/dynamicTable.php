@@ -89,17 +89,17 @@ foreach ($users as $index => $user) {
         if (!is_array($data) && !is_object($data)) {
             $rowData .= $data;
         } else {
-            foreach ($data as $hh => $gg) {
-                if ($hh === 'gender') {
-                    if ($gg == 'm') {
+            foreach ($data as $k => $v) {
+                if ($k === 'gender') {
+                    if ($v == 'm') {
                         $rowData .= "Male";
-                    } elseif ($gg == 'f') {
+                    } elseif ($v == 'f') {
                         $rowData .= "Female";
                     }else {
                         $rowData .= "Other";
                     }
                 } else {
-                    $rowData .= $gg . ",<br>";
+                    $rowData .= $v . ",<br>";
                 }
             }
         }
