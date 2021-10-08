@@ -4,8 +4,12 @@ include_once("layouts/header.php");
 include_once("middleware/authSurvey.php");
 
 $message = "<div class='alert alert-success'> Thank You For Your Survey</div>";
+$totalMsg = "<tr class='bg-success'><th class='text-center'>Total Review</th><td>
+<div class='h6'>Good</div></td></tr>";
 if($_SESSION['total'] < 25) {
     $message = "<div class='alert alert-danger'> We'll Call You on This Number ". $_SESSION['phoneNumber'] ."</div>";
+    $totalMsg = "<tr class='bg-danger'><th class='text-center'>Total Review</th><td>
+<div class='h6'>Bad</div></td></tr>";
 }
 
 $review = [];
@@ -40,6 +44,8 @@ session_destroy();
         <div class="col-12 text-center bg-dark text-white">
             <div class="h1 text-center py-5">Hospital Survey Review</div>
                 <div class="col-9 offset-1">
+                    
+                <?= $message ?>
                     <table class="table table-bordered table-hover table-dark">
                         <thead>
                             <tr>
@@ -78,9 +84,9 @@ session_destroy();
                                     <div class="h6"><?= $review[4] ?></div>
                                 </td>
                             </tr>
+                            <?= $totalMsg ?>
                         </tbody>
                     </table>
-                    <?= $message ?>
                 </div>
         </div>
     </div>
