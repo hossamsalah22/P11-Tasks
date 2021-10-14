@@ -1,2 +1,2 @@
 # P11-Tasks
-#This Repo Contain The Soultuions of specific task in nti Php Module
+#This Repo Contain The Soultuions of specific tasks in nti Php Module
