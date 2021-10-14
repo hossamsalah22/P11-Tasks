@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 13, 2021 at 10:57 PM
+-- Generation Time: Oct 14, 2021 at 09:26 AM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 7.4.24
 
@@ -311,6 +311,7 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(20) NOT NULL,
   `phone` varchar(11) NOT NULL,
+  `gender` enum('m','f') NOT NULL COMMENT 'f=>Female\r\nm=>Male',
   `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=>not verified\r\n1=>verified',
   `code` varchar(5) DEFAULT NULL,
   `verified_at` timestamp NULL DEFAULT NULL,
