@@ -1,10 +1,13 @@
 <?php
 $title = "Register";
 include_once "views/layouts/header.php";
+include_once "middleware/guest.php";
 include_once "views/layouts/nav.php";
 include_once "views/layouts/breadcrumb.php";
 include_once "app/request/registerRequest.php";
 include_once "app/database/models/User.php";
+include_once "app/mail/mail.php";
+
 if ($_POST) {
     $regesterValidation = new registerRequest;
     $regesterValidation->setEmail($_POST["email"]);
@@ -35,8 +38,18 @@ if ($_POST) {
             $userObject->setCode($code);
             $createResult = $userObject->create();
             if ($createResult) {
-                echo "ok";
-                die;
+                // Send Email To user
+                $subject = "Ecommerce Verificartion Code";
+                $body = "<h2>Hello {$_POST['first_name']}</h2><h3>Your Verification Code Is: <strong>{$code}</strong></h3>";
+                $newMail = new mail($_POST['email'],$subject,$body);
+                $mailResult = $newMail->sendMail();
+                if($mailResult) {
+                    $_SESSION['email'] = $_POST['email'];
+                    header("Location:check-code.php?page=register");die; 
+                } else {
+                    $mailError = "<div class='alert alert-danger'> Something Went Wrong, Try To Verify Later </div>";
+                }
+                // header("Location:check-code.php");
             } else {
                 $databaseError = "<div class='alert alert-danger'> Something Went Wrong </div>";
             }
@@ -59,13 +72,18 @@ if ($_POST) {
                         <div id="lg2" class="tab-pane active">
                             <div class="login-form-container">
                                 <div class="login-register-form">
-                                    <form action="#" method="post">
+                                    <form method="post">
                                         <?php
-                                            if(isset($databaseError)) {
-                                                echo $databaseError;
-                                            }
+                                        if (isset($databaseError)) {
+                                            echo $databaseError;
+                                        }
+                                        if (isset($mailError)) {
+                                            echo $mailError;
+                                        }
                                         ?>
-                                        <input type="text" name="first_name" placeholder="First Name" value = "<?php if(!empty($_POST['first_name'])){echo $_POST['first_name'];} ?>">
+                                        <input type="text" name="first_name" placeholder="First Name" value="<?php if (!empty($_POST['first_name'])) {
+                                                                                                                    echo $_POST['first_name'];
+                                                                                                                } ?>">
                                         <?php
                                         if (!empty($firstNameValidationResult)) {
                                             foreach ($firstNameValidationResult as $key => $value) {
@@ -73,7 +91,9 @@ if ($_POST) {
                                             }
                                         }
                                         ?>
-                                        <input type="text" name="last_name" placeholder="Last Name" value = "<?php if(!empty($_POST['last_name'])){echo $_POST['last_name'];} ?>">
+                                        <input type="text" name="last_name" placeholder="Last Name" value="<?php if (!empty($_POST['last_name'])) {
+                                                                                                                echo $_POST['last_name'];
+                                                                                                            } ?>">
                                         <?php
                                         if (!empty($lastNameValidationResult)) {
                                             foreach ($lastNameValidationResult as $key => $value) {
@@ -81,7 +101,9 @@ if ($_POST) {
                                             }
                                         }
                                         ?>
-                                        <input type="email" name="email" placeholder="Email" value = "<?php if(!empty($_POST['email'])){echo $_POST['email'];} ?>">
+                                        <input type="email" name="email" placeholder="Email" value="<?php if (!empty($_POST['email'])) {
+                                                                                                        echo $_POST['email'];
+                                                                                                    } ?>">
                                         <?php
                                         if (!empty($emailValidationResult)) {
                                             foreach ($emailValidationResult as $key => $value) {
@@ -112,7 +134,9 @@ if ($_POST) {
                                             echo $passwordValidationResult['password-confirm'];
                                         }
                                         ?>
-                                        <input type="tel" name="phone" placeholder="Phone Number" value = "<?php if(!empty($_POST['phone'])){echo $_POST['phone'];} ?>">
+                                        <input type="tel" name="phone" placeholder="Phone Number" value="<?php if (!empty($_POST['phone'])) {
+                                                                                                                echo $_POST['phone'];
+                                                                                                            } ?>">
                                         <?php
                                         if (!empty($phoneValidation)) {
                                             foreach ($phoneValidation as $key => $value) {
@@ -126,9 +150,16 @@ if ($_POST) {
                                         }
                                         ?>
                                         <select name="gender" class="form-control">
-                                            <option value="" selected hidden>Select Gender</option>
-                                            <option value="m" <?php if($_POST["gender"] == "m"){echo "selected";} ?>>Male</option>
-                                            <option value="f" <?php if($_POST["gender"] == "f"){echo "selected";} ?>>Female</option>
+                                            <option value="m" <?php if (isset($_POST["gender"])) {
+                                                                    if ($_POST["gender"] == "m") {
+                                                                        echo "selected";
+                                                                    }
+                                                                } ?>>Male</option>
+                                            <option value="f" <?php if (isset($_POST["gender"])) {
+                                                                    if ($_POST["gender"] == "f") {
+                                                                        echo "selected";
+                                                                    }
+                                                                } ?>>Female</option>
                                         </select>
                                         <?php
                                         if (!empty($genderValidationResult)) {

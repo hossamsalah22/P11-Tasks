@@ -139,7 +139,7 @@ class User extends connection implements crud
      */
     public function setPassword($password)
     {
-        $this->password = $password;
+        $this->password = sha1($password);
 
         return $this;
     }
@@ -293,5 +293,35 @@ class User extends connection implements crud
     {
         $query = "SELECT * FROM users WHERE phone = '$this->phone'";
         return $this->runDQL($query);
+    }
+
+    public function checkCode()
+    {
+        $query = "SELECT * FROM users WHERE email = '$this->email' AND code = '$this->code'";
+        return $this->runDQL($query);
+    }
+
+    public function verifyUser()
+    {
+        $query = "UPDATE users SET status = '$this->status' , verified_at = '$this->verified_at'";
+        return $this->runDML($query);
+    }
+
+    public function login()
+    {
+        $query = "SELECT * FROM users WHERE email = '$this->email' AND password = '$this->password'";
+        return $this->runDQL($query);
+    }
+
+    public function updateCode()
+    {
+        $query = "UPDATE users SET code = '$this->code' WHERE email = '$this->email' ";
+        return $this->runDmL($query);
+    }
+
+    public function updatePassword()
+    {
+        $query = "UPDATE users SET password = '$this->password' WHERE email = '$this->email' ";
+        return $this->runDmL($query);
     }
 }

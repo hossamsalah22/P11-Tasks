@@ -1,58 +1,45 @@
 <?php
-$title = "Login";
+$title = "Verify Email";
 include_once "views/layouts/header.php";
 include_once "middleware/guest.php";
-include_once "views/layouts/nav.php";
-include_once "views/layouts/breadcrumb.php";
-include_once "app/request/registerRequest.php";
-include_once "app/request/loginRequest.php";
+include_once "app/request/checkCodeRequest.php";
 include_once "app/database/models/User.php";
+include_once "app/request/registerRequest.php";
 include_once "app/mail/mail.php";
 
-if (isset($_POST['login'])) {
+if (isset($_POST['verify-email'])) {
     $errors = [];
-    // email Valdidation
     $emailValidation = new registerRequest;
     $emailValidation->setEmail($_POST['email']);
     $emailValidationResult = $emailValidation->emailValidation();
-    // password Validation
-    $passwordValidation = new loginRequest;
-    $passwordValidation->setPassword($_POST['password']);
-    $passwordValidationResult = $passwordValidation->passwordValidation();
-    // Validation Success
-    if (empty($emailValidationResult) && empty($emailValidationResult)) {
-        $userData = new User;
-        $userData->setEmail($_POST['email']);
-        $userData->setPassword($_POST['password']);
-        $loginResult = $userData->login();
-        // if attempt success
-        if ($loginResult) {
-            $user = $loginResult->fetch_object();
-            // check user status
-            if ($user->status != 1) {
-                $subject = "Ecommerce Verificartion Code";
-                $body = "<h2>Hello {$user->first_name}</h2><h3>Your Verification Code Is: <strong>{$user->code}</strong></h3>";
+    if (empty($emailValidationResult)) {
+        $emailExistsResult = $emailValidation->emailExists();
+        if (!empty($emailExistsResult)) {
+            $code = rand(10000, 99999);
+            $userData = new User;
+            $userData->setCode($code);
+            $userData->setEmail($_POST['email']);
+            $updateCodeResult = $userData->updateCode();
+            if ($updateCodeResult) {
+                $checkIfEmailExistsResult = $userData->checkifEmailExists();
+                $user = $checkIfEmailExistsResult->fetch_object();
+                $subject = "Ecommerce Foreget Password Verification Code";
+                $body = "<h2>Hello {$user->first_name}</h2><h3>Your Verification Code Is: <strong>{$code}</strong></h3>";
                 $newMail = new mail($_POST['email'], $subject, $body);
                 $mailResult = $newMail->sendMail();
-                // if user not verified send mail again and goto check-code page
                 if ($mailResult) {
                     $_SESSION['email'] = $_POST['email'];
-                    header("Location:check-code.php?page=login");
-                    die;
+                    header("Location:check-code.php?page=verify");die;
                 } else {
-                    $errors['mail-error'] = "<div class='alert alert-danger'> Something Went Wrong </div>";
+                    $mailError = "<div class='alert alert-danger'> Something Went Wrong</div>";
                 }
-                // if user Verified goto home page
             } else {
-                $_SESSION['user'] = $user;
-                header("Location:index.php");
-                die;
+                $errors['update-error'] = "<div class='alert alert-danger'> Something Went Wrong</div>";
             }
-        } else {
-            $errors['wrong-attempt'] = "<div class='alert alert-danger'> Wrong Data </div>";
         }
     }
 }
+
 ?>
 
 
@@ -63,7 +50,7 @@ if (isset($_POST['login'])) {
                 <div class="login-register-wrapper">
                     <div class="login-register-tab-list nav">
                         <a class="active" data-toggle="tab" href="#lg1">
-                            <h4> login </h4>
+                            <h4> <?= $title ?> </h4>
                         </a>
                     </div>
                     <div class="tab-content">
@@ -80,25 +67,17 @@ if (isset($_POST['login'])) {
                                                 echo $value;
                                             }
                                         }
-                                        ?>
-                                        <input type="password" name="password" placeholder="Password">
-                                        <?php
-                                        if (!empty($passwordValidationResult)) {
-                                            foreach ($passwordValidationResult as $key => $value) {
-                                                echo $value;
-                                            }
-                                        }
-                                        if (isset($errors)) {
+                                        if (!empty($errors)) {
                                             foreach ($errors as $key => $value) {
                                                 echo $value;
                                             }
                                         }
+                                        if (isset($emailExistsResult) && empty($emailExistsResult)) {
+                                            echo "<div class='alert alert-danger'> Email Not Found </div>";
+                                        }
                                         ?>
                                         <div class="button-box">
-                                            <div class="login-toggle-btn">
-                                                <a href="verify-email.php">Forgot Password?</a>
-                                            </div>
-                                            <button type="submit" name="login"><span>Login</span></button>
+                                            <button type="submit" name="verify-email" class="form-control"><span><?= $title ?></span></button>
                                         </div>
                                     </form>
                                 </div>
