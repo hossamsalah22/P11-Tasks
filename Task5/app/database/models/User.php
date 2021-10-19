@@ -14,6 +14,7 @@ class User extends connection implements crud
     private $gender;
     private $status;
     private $code;
+    private $image;
     private $verified_at;
     private $created_at;
     private $updated_at;
@@ -29,7 +30,7 @@ class User extends connection implements crud
          '$this->phone',
          '$this->gender',
          '$this->code')";
-         return $this->runDML($query);
+        return $this->runDML($query);
     }
     public function read()
     {
@@ -37,7 +38,14 @@ class User extends connection implements crud
     }
     public function update()
     {
-        # code...
+        $query = "UPDATE users SET 
+                        first_name = '$this->first_name',
+                        last_name = '$this->last_name',
+                        phone = '$this->phone',
+                        gender = '$this->gender'";
+        $query .= $this->image ? ",image = '$this->image'" : "";
+        $query .= "WHERE id = $this->id";
+        return $this->runDML($query);
     }
     public function delete()
     {
@@ -225,6 +233,26 @@ class User extends connection implements crud
     }
 
     /**
+     * Get the value of image
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Set the value of image
+     *
+     * @return  self
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    /**
      * Get the value of verified_at
      */
     public function getVerified_at()
@@ -284,6 +312,12 @@ class User extends connection implements crud
         return $this;
     }
 
+    public function getUserById()
+    {
+        $query = "SELECT * FROM users WHERE id = '$this->id'";
+        return $this->runDQL($query);
+    }
+
     public function checkifEmailExists()
     {
         $query = "SELECT * FROM users WHERE email = '$this->email'";
@@ -303,7 +337,7 @@ class User extends connection implements crud
 
     public function verifyUser()
     {
-        $query = "UPDATE users SET status = '$this->status' , verified_at = '$this->verified_at'";
+        $query = "UPDATE users SET status = '$this->status' , verified_at = '$this->verified_at' WHERE email = '$this->email'";
         return $this->runDML($query);
     }
 
@@ -322,6 +356,17 @@ class User extends connection implements crud
     public function updatePassword()
     {
         $query = "UPDATE users SET password = '$this->password' WHERE email = '$this->email' ";
+        return $this->runDmL($query);
+    }
+
+    public function updateEmail()
+    {
+        $query = "UPDATE users SET
+         code = '$this->code',
+         email = '$this->email',
+         status = $this->status,
+         verified_at = $this->verified_at
+         WHERE id = $this->id ";
         return $this->runDmL($query);
     }
 }

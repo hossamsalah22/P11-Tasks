@@ -9,7 +9,7 @@ if ($_GET) {
         header("Location:views/errors/404.php");
         die;
     } else {
-        if (!in_array($_GET['page'], ['login', 'register', 'verify'])) {
+        if (!in_array($_GET['page'], ['login', 'register', 'verify','change-email'])) {
             header("Location:views/errors/404.php");
             die;
         }
@@ -46,6 +46,11 @@ if (isset($_POST['check-code'])) {
                         die;
                     case 'verify':
                         header("Location:new-password.php");
+                        die;
+                    case 'change-email':
+                        $_SESSION['user'] = $checkCodeResult->fetch_object();
+                        header("Location:my-account.php");
+                        unset($_SESSION['email']);
                         die;
                     default:
                         header("Location:views/errors/404.php");
