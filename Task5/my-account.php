@@ -365,7 +365,7 @@ include_once "views/layouts/breadcrumb.php";
                             <div class="panel-heading">
                                 <h5 class="panel-title"><span>3</span> <a data-toggle="collapse" data-parent="#faq" href="#my-account-3">Change Your Email</a></h5>
                             </div>
-                            <div id="my-account-3" class="panel-collapse collapse  <?php if (isset($_POST['change-email'])) {
+                            <div id="my-account-3" class="panel-collapse collapse  <?php if (isset($_POST['change-email']) || isset($_SESSION['email-updated'])) {
                                                                                         echo "show";
                                                                                     } ?>">
                                 <div class="panel-body">
@@ -378,6 +378,14 @@ include_once "views/layouts/breadcrumb.php";
                                                 <form method="post">
 
                                                     <div class="row">
+                                                        <div class="col-12">
+                                                            <?php
+                                                                if(isset($_SESSION['email-updated'])) {
+                                                                    echo $_SESSION['email-updated'];
+                                                                    unset($_SESSION['email-updated']);
+                                                                }
+                                                            ?>
+                                                        </div>
                                                         <div class="col-lg-12 col-md-12">
                                                             <div class="billing-info">
                                                                 <label>Email</label>

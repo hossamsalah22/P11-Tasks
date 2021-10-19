@@ -49,6 +49,7 @@ if (isset($_POST['check-code'])) {
                         die;
                     case 'change-email':
                         $_SESSION['user'] = $checkCodeResult->fetch_object();
+                        $_SESSION['email-updated'] = "<div class='alert alert-success'> Email Updated Successfully </div>";
                         header("Location:my-account.php");
                         unset($_SESSION['email']);
                         die;
