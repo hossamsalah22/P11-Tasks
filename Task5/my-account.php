@@ -14,6 +14,9 @@ include_once "app/mail/mail.php";
 $userData = new User;
 $userData->setId($_SESSION['user']->id);
 define('notVerified', 0);
+if ($_SESSION['user']->image != "defualt.png") {
+    $oldImage = $_SESSION['user']->image;
+}
 
 // Update User in DB Validation
 if (isset($_POST['update-profile'])) {
@@ -53,6 +56,10 @@ if (isset($_POST['update-profile'])) {
         if (empty($sizeValidation) && empty($extensionValidation)) {
             $updateResult = $userData->update();
             if ($updateResult) {
+                // Delete old photo 
+                if (isset($oldImage)) {
+                    unlink($directory . $oldImage);
+                }
                 // update Session if update was successful 
                 $_SESSION['user']->first_name = $_POST['first_name'];
                 $_SESSION['user']->last_name = $_POST['last_name'];
@@ -133,10 +140,11 @@ if (isset($_POST['change-email'])) {
                     $body = "<h2>Hello {$_SESSION['user']->first_name}</h2><h3>Your Verification Code Is: <strong>{$code}</strong></h3>";
                     $mail = new mail($_POST['email'], $subject, $body);
                     $mailResult = $mail->sendMail();
-                    if($mailResult) {
+                    if ($mailResult) {
                         unset($_SESSION['user']);
                         $_SESSION['email'] = $_POST['email'];
-                        header("Location:check-code.php?page=change-email");die;
+                        header("Location:check-code.php?page=change-email");
+                        die;
                     } else {
                         $errors['email-failed'] = "<div class='alert alert-danger'> Something Went Wrong </div>";
                     }
@@ -380,10 +388,10 @@ include_once "views/layouts/breadcrumb.php";
                                                     <div class="row">
                                                         <div class="col-12">
                                                             <?php
-                                                                if(isset($_SESSION['email-updated'])) {
-                                                                    echo $_SESSION['email-updated'];
-                                                                    unset($_SESSION['email-updated']);
-                                                                }
+                                                            if (isset($_SESSION['email-updated'])) {
+                                                                echo $_SESSION['email-updated'];
+                                                                unset($_SESSION['email-updated']);
+                                                            }
                                                             ?>
                                                         </div>
                                                         <div class="col-lg-12 col-md-12">
