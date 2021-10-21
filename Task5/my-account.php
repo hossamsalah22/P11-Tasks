@@ -14,7 +14,7 @@ include_once "app/mail/mail.php";
 $userData = new User;
 $userData->setId($_SESSION['user']->id);
 define('notVerified', 0);
-if ($_SESSION['user']->image != "defualt.png") {
+if ($_SESSION['user']->image != "default.png") {
     $oldImage = $_SESSION['user']->image;
 }
 

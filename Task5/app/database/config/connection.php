@@ -5,7 +5,7 @@ class connection
     private $hostname = 'localhost';
     private $username = 'root';
     private $password = '';
-    private $database = 'task4-ecommerce';
+    private $database = 'task5-ecommerce';
     private $connection;
     // Connect to Database
     function __construct()
