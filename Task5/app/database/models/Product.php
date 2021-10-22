@@ -442,7 +442,7 @@ class Product extends connection implements crud
         `products`
     JOIN `orders_products` ON `orders_products`.`product_id` = `products`.`id`
     WHERE
-        `products`.`status` = '1'
+        `products`.`status` = '" . self::available . "'
     GROUP BY
         `products`.`id`
         ORDER BY
@@ -465,10 +465,26 @@ class Product extends connection implements crud
     FROM
         `products`
     WHERE
-        `status` = '1'
+        `status` = '" . self::available . "'
     ORDER BY
      `views` DESC , `created_at` ASC
     LIMIT 4";
+        return $this->runDQL($query);
+    }
+
+    public function getRelatedProducts()
+    {
+        $query = "SELECT `products`.`id`,
+         `products`.`name_en`,
+          `products`.`price`,
+           `products`.`image`,
+            `products`.`desc_en`
+             FROM `products`
+             JOIN `subcategories` ON `products`.`subcategory_id` = `subcategories`.`id` 
+             JOIN `brands` ON `products`.`brand_id` = `brands`.`id` 
+             WHERE $this->id NOT IN (`products`.`id`) AND `products`.`subcategory_id` = $this->subcategory_id AND 
+              `products`.`status` = '" . self::available . "'
+              ORDER BY `products`.`views` DESC";
         return $this->runDQL($query);
     }
 }
