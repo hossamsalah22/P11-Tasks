@@ -16,6 +16,7 @@ class Product extends connection implements crud
     private $desc_en;
     private $quantity;
     private $status;
+    private $views;
     private $subcategory_id;
     private $brand_id;
     private $created_at;
@@ -204,6 +205,26 @@ class Product extends connection implements crud
     }
 
     /**
+     * Get the value of views
+     */
+    public function getViews()
+    {
+        return $this->views;
+    }
+
+    /**
+     * Set the value of views
+     *
+     * @return  self
+     */
+    public function setViews($views)
+    {
+        $this->views = $views;
+
+        return $this;
+    }
+
+    /**
      * Get the value of subcategory_id
      */
     public function getSubcategory_id()
@@ -334,6 +355,9 @@ class Product extends connection implements crud
     WHERE
     `products`.`id` = $this->id AND `products`.`status` = '" . self::available . "'
     GROUP BY `products`.`id`";
+        $incViews = "UPDATE `products` SET `products`.`views` = (`products`.`views` + 1) WHERE
+    `products`.`id` = $this->id";
+        $this->runDML($incViews);
         return $this->runDQL($query);
     }
 
@@ -383,7 +407,6 @@ class Product extends connection implements crud
         `products`.`name_en`,
         `products`.`price`,
         `products`.`image`,
-        `products`.`desc_en`,
         COUNT(`reviews`.`product_id`) AS `product_reviews`,
         IF(
             ROUND(AVG(`reviews`.`value`)) IS NULL,
@@ -392,7 +415,7 @@ class Product extends connection implements crud
         ) AS `reviews_avarage`
     FROM
         `products`
-    LEFT JOIN `reviews` ON `reviews`.`product_id` = `products`.`id`
+    JOIN `reviews` ON `reviews`.`product_id` = `products`.`id`
     WHERE
         `products`.`status` = '" . self::available . "'
     GROUP BY
@@ -413,12 +436,11 @@ class Product extends connection implements crud
         `products`.`name_en`,
         `products`.`price`,
         `products`.`image`,
-        `products`.`desc_en`,
         COUNT(`orders_products`.`product_id`) AS `count_of_orders_per_product`,
         ROUND(AVG(`orders_products`.`quantity`)) AS `average_quantity_per_order`
     FROM
         `products`
-    LEFT JOIN `orders_products` ON `orders_products`.`product_id` = `products`.`id`
+    JOIN `orders_products` ON `orders_products`.`product_id` = `products`.`id`
     WHERE
         `products`.`status` = '1'
     GROUP BY
@@ -428,6 +450,24 @@ class Product extends connection implements crud
     DESC,
      `average_quantity_per_order`
     DESC
+    LIMIT 4";
+        return $this->runDQL($query);
+    }
+
+    public function getMostViewedProducts()
+    {
+        $query = "SELECT
+        `id`,
+        `name_en`,
+        `price`,
+        `image`,
+        `views`
+    FROM
+        `products`
+    WHERE
+        `status` = '1'
+    ORDER BY
+     `views` DESC , `created_at` ASC
     LIMIT 4";
         return $this->runDQL($query);
     }

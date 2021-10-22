@@ -7,6 +7,7 @@ include_once "app/database/models/Product.php";
 include_once "app/database/models/Category.php";
 include_once "app/database/models/Subcategory.php";
 include_once "app/database/models/Brand.php";
+include_once "app/database/models/Offer_Product.php";
 
 $productsObject = new Product;
 
@@ -17,6 +18,8 @@ $subcategoriesObject = new Subcategory;
 
 $brandsObject = new Brand;
 $getBrands = $brandsObject->read();
+
+$offersObject = new Offer_Product;
 
 if ($_GET) {
     if (isset($_GET['sub'])) {
@@ -41,6 +44,20 @@ if ($_GET) {
             if ($result) {
                 $productsObject->setBrand_id($_GET['brand']);
                 $getProducts = $productsObject->readByBrand();
+            } else {
+                header("Location:views/errors/404.php");
+                die;
+            }
+        } else {
+            header("Location:views/errors/404.php");
+            die;
+        }
+    } elseif (isset($_GET['offer'])) {
+        if (is_numeric($_GET['offer'])) {
+            $offersObject->setOffer_id($_GET['offer']);
+            $result = $offersObject->read();
+            if ($result) {
+                $getProducts = $offersObject->getProducts();
             } else {
                 header("Location:views/errors/404.php");
                 die;
@@ -132,7 +149,14 @@ if ($_GET) {
                                                     </div>
                                                 </div>
                                                 <div class="product-price-wrapper">
-                                                    <span><?= $product['price'] . " EGP" ?></span>
+                                                    <?php
+                                                    if (isset($product['price_after_disc'])) { ?>
+                                                        <span><?= $product['price_after_disc'] . " EGP" ?></span>
+                                                        <span class="product-price-old"><?= $product['original_price'] . " EGP" ?> </span>
+                                                    <?php } else { ?>
+                                                        <span><?= $product['price'] . " EGP" ?></span>
+                                                    <?php }
+                                                    ?>
                                                 </div>
                                             </div>
                                             <!-- List View -->
@@ -141,7 +165,14 @@ if ($_GET) {
                                                     <a href="product-details.php?product=<?= $product['id'] ?>"><?= $product['name_en'] ?></a>
                                                 </h4>
                                                 <div class="product-price-wrapper">
-                                                    <span><?= $product['price'] . " EGP" ?></span>
+                                                    <?php
+                                                    if (isset($product['price_after_disc'])) { ?>
+                                                        <span><?= $product['price_after_disc'] . " EGP" ?></span>
+                                                        <span class="product-price-old"><?= $product['original_price'] . " EGP" ?> </span>
+                                                    <?php } else { ?>
+                                                        <span><?= $product['price'] . " EGP" ?></span>
+                                                    <?php }
+                                                    ?>
                                                 </div>
                                                 <p><?= $product['desc_en'] ?></p>
                                                 <div class="shop-list-cart-wishlist">
@@ -233,18 +264,17 @@ if ($_GET) {
                         <div class="sidebar-list-style mt-20">
                             <ul>
                                 <?php
-                                    $brands = $getBrands->fetch_all(MYSQLI_ASSOC);
-                                    if($brands) {
-                                        foreach ($brands as $index => $brand) { ?>
-                                            <li><a href="shop.php?brand=<?= $brand['id'] ?>"><?= $brand['name_en'] ?> </a></li>
-                                     <?php   }
-
-                                    } else { ?>
-                                        <div class="alert alert-danger">Sorry No Brands Found</div>
-                                   <?php }
+                                $brands = $getBrands->fetch_all(MYSQLI_ASSOC);
+                                if ($brands) {
+                                    foreach ($brands as $index => $brand) { ?>
+                                        <li><a href="shop.php?brand=<?= $brand['id'] ?>"><?= $brand['name_en'] ?> </a></li>
+                                    <?php   }
+                                } else { ?>
+                                    <div class="alert alert-danger">Sorry No Brands Found</div>
+                                <?php }
                                 ?>
-                                
-                                
+
+
                             </ul>
                         </div>
                     </div>

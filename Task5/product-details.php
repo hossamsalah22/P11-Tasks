@@ -1,8 +1,10 @@
 <?php
 
 include_once "app/database/models/Product.php";
+include_once "app/database/models/Offer_product.php";
 
 $productsObject = new Product;
+$offerObject = new Offer_Product;
 
 if ($_GET) {
     if (isset($_GET['product'])) {
@@ -11,6 +13,8 @@ if ($_GET) {
             $getProduct = $productsObject->find();
             if ($getProduct) {
                 $product = $getProduct->fetch_object();
+                $offerObject->setProduct_id($product->id);
+                $offerExists = $offerObject->readOffers();
             } else {
                 header("Location:views/errors/404.php");
                 die;
@@ -63,18 +67,32 @@ include_once "views/layouts/breadcrumb.php";
                             </ul>
                         </div>
                     </div>
-                    <span><?= $product->price ?> EGP</span>
-                    <div class="in-stock">
+                    <div class="product-price-wrapper">
                         <?php
-                        if ($product->quantity > 0 && $product->quantity <= 5) { ?>
-                            <p>Available: <span class="text-warning">Only (<?= $product->quantity ?>) In stock</span></p>
-                        <?php } elseif ($product->quantity > 5) { ?>
-                            <p>Available: <span class="text-success">In stock: </span></p>
-                        <?php } else { ?>
-                            <p class="text-danger">Out of stock</p>
-                        <?php }
+                        if ($offerExists) {
+                            $getPriceDisc = $offerObject->getPriceAfterDiscount();
+                            $priceDisc = $getPriceDisc->fetch_object();
+                            if ($priceDisc) {
+                        ?>
+                                <span><?= $priceDisc->price_after_disc . " EGP" ?></span>
+                                <span class="product-price-old"><?= $priceDisc->original_price . " EGP" ?> </span>
+                            <?php }
+                        } else { ?>
+                            <span><?= $product->price ?> EGP</span>
+                        <?php  }
                         ?>
 
+                        <div class="in-stock">
+                            <?php
+                            if ($product->quantity > 0 && $product->quantity <= 5) { ?>
+                                <p>Available: <span class="text-warning">Only (<?= $product->quantity ?>) In stock</span></p>
+                            <?php } elseif ($product->quantity > 5) { ?>
+                                <p>Available: <span class="text-success">In stock: (<?= $product->quantity ?>)</span></p>
+                            <?php } else { ?>
+                                <p class="text-danger">Out of stock</p>
+                            <?php }
+                            ?>
+                        </div>
                     </div>
                     <p><?= $product->desc_en ?></p>
                     <div class="pro-dec-feature">
@@ -159,7 +177,7 @@ include_once "views/layouts/breadcrumb.php";
                                             <span><?= $review['created_at'] ?></span>
                                         </div>
                                     </div>
-                                    <p><?= $review['comment']?></p>
+                                    <p><?= $review['comment'] ?></p>
                                 </div>
                             </div>
                     <?php }
