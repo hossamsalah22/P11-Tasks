@@ -168,10 +168,17 @@ class Brand extends connection implements crud
     }
     public function read()
     {
-        $query = "SELECT id FROM brands WHERE id = $this->id";
+        $query = "SELECT id , name_en FROM brands WHERE status = '1'";
         return $this->runDQL($query);
     }
     public function delete()
     {
+    }
+
+    
+    public function getBrand()
+    {
+        $query = "SELECT id FROM brands WHERE id = $this->id";
+        return $this->runDQL($query);
     }
 }

@@ -359,4 +359,76 @@ class Product extends connection implements crud
         `reviews`.`product_id` = $this->id";
         return $this->runDQL($query);
     }
+
+    public function getNewProducts()
+    {
+        $query = "SELECT
+        `id`,
+        `name_en`,
+        `price`,
+        `image`,
+        `desc_en`
+    FROM `products`
+    WHERE `status` = '" . self::available . "'
+    ORDER BY
+        `created_at` DESC , `name_en` DESC
+    LIMIT 4";
+        return $this->runDQL($query);
+    }
+
+    public function getMostReviewedProducts()
+    {
+        $query = "SELECT
+        `products`.`id`,
+        `products`.`name_en`,
+        `products`.`price`,
+        `products`.`image`,
+        `products`.`desc_en`,
+        COUNT(`reviews`.`product_id`) AS `product_reviews`,
+        IF(
+            ROUND(AVG(`reviews`.`value`)) IS NULL,
+            0,
+            ROUND(AVG(`reviews`.`value`))
+        ) AS `reviews_avarage`
+    FROM
+        `products`
+    LEFT JOIN `reviews` ON `reviews`.`product_id` = `products`.`id`
+    WHERE
+        `products`.`status` = '" . self::available . "'
+    GROUP BY
+        `products`.`id`
+        ORDER BY
+        `product_reviews`
+    DESC,
+     `reviews_avarage`
+    DESC
+    LIMIT 4";
+        return $this->runDQL($query);
+    }
+
+    public function getMostOrderedProducts()
+    {
+        $query = "SELECT
+        `products`.`id`,
+        `products`.`name_en`,
+        `products`.`price`,
+        `products`.`image`,
+        `products`.`desc_en`,
+        COUNT(`orders_products`.`product_id`) AS `count_of_orders_per_product`,
+        ROUND(AVG(`orders_products`.`quantity`)) AS `average_quantity_per_order`
+    FROM
+        `products`
+    LEFT JOIN `orders_products` ON `orders_products`.`product_id` = `products`.`id`
+    WHERE
+        `products`.`status` = '1'
+    GROUP BY
+        `products`.`id`
+        ORDER BY
+        `count_of_orders_per_product`
+    DESC,
+     `average_quantity_per_order`
+    DESC
+    LIMIT 4";
+        return $this->runDQL($query);
+    }
 }

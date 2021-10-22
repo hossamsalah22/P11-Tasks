@@ -16,6 +16,7 @@ $getCategories = $categoriesObject->read();
 $subcategoriesObject = new Subcategory;
 
 $brandsObject = new Brand;
+$getBrands = $brandsObject->read();
 
 if ($_GET) {
     if (isset($_GET['sub'])) {
@@ -36,7 +37,7 @@ if ($_GET) {
     } elseif (isset($_GET['brand'])) {
         if (is_numeric($_GET['brand'])) {
             $brandsObject->setId($_GET['brand']);
-            $result = $brandsObject->read();
+            $result = $brandsObject->getBrand();
             if ($result) {
                 $productsObject->setBrand_id($_GET['brand']);
                 $getProducts = $productsObject->readByBrand();
@@ -227,68 +228,23 @@ if ($_GET) {
                             </ul>
                         </div>
                     </div>
-                    <div class="shop-price-filter mt-40 shop-sidebar-border pt-35">
-                        <h4 class="shop-sidebar-title">Price Filter</h4>
-                        <div class="price_filter mt-25">
-                            <span>Range: $100.00 - 1.300.00 </span>
-                            <div id="slider-range"></div>
-                            <div class="price_slider_amount">
-                                <div class="label-input">
-                                    <input type="text" id="amount" name="price" placeholder="Add Your Price" />
-                                </div>
-                                <button type="button">Filter</button>
-                            </div>
-                        </div>
-                    </div>
                     <div class="shop-widget mt-40 shop-sidebar-border pt-35">
-                        <h4 class="shop-sidebar-title">By Brand</h4>
+                        <h4 class="shop-sidebar-title">Shop By Categories</h4>
                         <div class="sidebar-list-style mt-20">
                             <ul>
-                                <li><input type="checkbox"><a href="#">Green </a>
-                                <li><input type="checkbox"><a href="#">Herbal </a></li>
-                                <li><input type="checkbox"><a href="#">Loose </a></li>
-                                <li><input type="checkbox"><a href="#">Mate </a></li>
-                                <li><input type="checkbox"><a href="#">Organic </a></li>
-                                <li><input type="checkbox"><a href="#">White </a></li>
-                                <li><input type="checkbox"><a href="#">Yellow Tea </a></li>
-                                <li><input type="checkbox"><a href="#">Puer Tea </a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="shop-widget mt-40 shop-sidebar-border pt-35">
-                        <h4 class="shop-sidebar-title">By Color</h4>
-                        <div class="sidebar-list-style mt-20">
-                            <ul>
-                                <li><input type="checkbox"><a href="#">Black </a></li>
-                                <li><input type="checkbox"><a href="#">Blue </a></li>
-                                <li><input type="checkbox"><a href="#">Green </a></li>
-                                <li><input type="checkbox"><a href="#">Grey </a></li>
-                                <li><input type="checkbox"><a href="#">Red</a></li>
-                                <li><input type="checkbox"><a href="#">White </a></li>
-                                <li><input type="checkbox"><a href="#">Yellow </a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="shop-widget mt-40 shop-sidebar-border pt-35">
-                        <h4 class="shop-sidebar-title">Compare Products</h4>
-                        <div class="compare-product">
-                            <p>You have no item to compare. </p>
-                            <div class="compare-product-btn">
-                                <span>Clear all </span>
-                                <a href="#">Compare <i class="fa fa-check"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="shop-widget mt-40 shop-sidebar-border pt-35">
-                        <h4 class="shop-sidebar-title">Popular Tags</h4>
-                        <div class="shop-tags mt-25">
-                            <ul>
-                                <li><a href="#">Green</a></li>
-                                <li><a href="#">Oolong</a></li>
-                                <li><a href="#">Black</a></li>
-                                <li><a href="#">Pu'erh</a></li>
-                                <li><a href="#">Dark </a></li>
-                                <li><a href="#">Special</a></li>
+                                <?php
+                                    $brands = $getBrands->fetch_all(MYSQLI_ASSOC);
+                                    if($brands) {
+                                        foreach ($brands as $index => $brand) { ?>
+                                            <li><a href="shop.php?brand=<?= $brand['id'] ?>"><?= $brand['name_en'] ?> </a></li>
+                                     <?php   }
+
+                                    } else { ?>
+                                        <div class="alert alert-danger">Sorry No Brands Found</div>
+                                   <?php }
+                                ?>
+                                
+                                
                             </ul>
                         </div>
                     </div>
