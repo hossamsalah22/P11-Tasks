@@ -31,8 +31,8 @@ class StoreProductRequest extends FormRequest
             'status' => 'required|integer|min:0|max:1',
             'subcategory_id' => 'required|string|exists:subcategories,id',
             'brand_id' => 'nullable|string|exists:brands,id',
-            'desc_ar' => 'required|string|max:255',
-            'desc_en' => 'required|string|max:255',
+            'desc_ar' => 'required|string|max:522',
+            'desc_en' => 'required|string|max:522',
             'image' => 'required|max:1000|mimes:jpg,png,jpeg'
         ];
     }
