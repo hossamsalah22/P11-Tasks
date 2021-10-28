@@ -8,7 +8,7 @@ trait apiResponse
     function responseJson($status, $message, $data = null)
     {
         $response = [
-            'status' => $status,
+            'Status' => $status,
             'message' => $message,
             'data' => (object)$data
         ];
