@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\apiResponse;
+use App\Mail\VerificationCode;
+use Illuminate\Support\Facades\Mail;
 
 class EmailVerificationController extends Controller
 {
@@ -25,6 +27,8 @@ class EmailVerificationController extends Controller
 
     public function sendCode(Request $request)
     {
+        $user = User::find(Auth::guard('sanctum')->user()->id);
+        Mail::to($user)->send(new VerificationCode($user));
         return $this->verificationOperation('code', rand(10000, 99999), 'Code Sent', $request);
     }
 

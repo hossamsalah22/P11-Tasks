@@ -17,7 +17,7 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = Product::all();
+        $products = Product::paginate(5);
         if ($products) {
             return $this->responseJson(200, "Success", compact('products'));
         } else {
